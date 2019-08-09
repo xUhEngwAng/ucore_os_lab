@@ -9,7 +9,6 @@
 #include <intr.h>
 #include <pmm.h>
 #include <kmonitor.h>
-int ticks_count = 0;
 
 int kern_init(void) __attribute__((noreturn));
 void grade_backtrace(void);

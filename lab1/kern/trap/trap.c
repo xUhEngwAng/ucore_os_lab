@@ -158,8 +158,8 @@ trap_dispatch(struct trapframe *tf) {
          * (3) Too Simple? Yes, I think so!
          */
 		
-		if(++ticks_count == TICK_NUM){
-			ticks_count = 0;
+		if(++ticks == TICK_NUM){
+			ticks = 0;
 			print_ticks();
 		}
         break;
