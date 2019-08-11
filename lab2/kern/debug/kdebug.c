@@ -305,5 +305,27 @@ print_stackframe(void) {
       *           NOTICE: the calling funciton's return addr eip  = ss:[ebp+4]
       *                   the calling funciton's ebp = ss:[ebp]
       */
+    struct eipdebuginfo info;
+    uint32_t curr_arg, offset, ix, count, eip, ebp;
+    uint8_t  flag = 1;
+    eip = read_eip();
+    ebp = read_ebp();
+    for(ix = 0; ix != STACKFRAME_DEPTH && flag;ix++){
+        cprintf("ebp:0x%08x eip:0x%08x ", ebp, eip);
+        
+        if(debuginfo_eip(eip, &info) != 0)
+             flag = 0;
+        for(count = 0; count != info.eip_fn_narg; count++){
+            offset = 8 + 4 * count;
+            asm volatile("addl %1, %0":"+r"(offset): "r"(ebp)); 
+            asm volatile("movl (%1), %0" : "=r"(curr_arg): "r"(offset));
+            cprintf(" 0x%08x", curr_arg);
+        }
+        cprintf("\n");
+        
+        print_debuginfo(eip);
+        
+        asm volatile("movl 4(%1), %0":"=r"(eip):"r"(ebp));
+        asm volatile("movl (%1), %0":"=r"(ebp):"r"(ebp));
 }
 
