@@ -305,7 +305,7 @@ print_stackframe(void) {
       *           NOTICE: the calling funciton's return addr eip  = ss:[ebp+4]
       *                   the calling funciton's ebp = ss:[ebp]
       */
-    struct eipdebuginfo info;
+   struct eipdebuginfo info;
     uint32_t curr_arg, offset, ix, count, eip, ebp;
     uint8_t  flag = 1;
     eip = read_eip();
@@ -327,5 +327,6 @@ print_stackframe(void) {
         
         asm volatile("movl 4(%1), %0":"=r"(eip):"r"(ebp));
         asm volatile("movl (%1), %0":"=r"(ebp):"r"(ebp));
+    }   
 }
 
