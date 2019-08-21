@@ -185,7 +185,12 @@ nr_free_pages(void) {
     return ret;
 }
 
-/* pmm_init - initialize the physical memory management */
+/* page_init - initialize the physical memory management */
+/* functionality: 
+ * I.   restore 820map in physical address & gather some information, such as # of pages and max physical address.
+ * II.  construct a struct `Page` for each physical page frame.
+ * III. initialize memory map by constructing `free_area` variable.
+ */
 static void
 page_init(void) {
     struct e820map *memmap = (struct e820map *)(0x8000 + KERNBASE);
