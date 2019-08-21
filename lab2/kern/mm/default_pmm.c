@@ -59,6 +59,20 @@ free_area_t free_area;
 #define free_list (free_area.free_list)
 #define nr_free (free_area.nr_free)
 
+
+/* search for a proper positon in free_list to place new memory block*/
+static void 
+insert2free_list(list_entry_t *elem){
+    list_entry_t *le = &free_list;
+    while((le = list_next(le)) != &free_list){
+        if(elem < le){
+            list_add_before(le, elem);
+            break;
+        }
+    }
+    if(le == &free_list) list_add_before(le, elem);
+}
+
 static void
 default_init(void) {
     list_init(&free_list);
@@ -298,15 +312,3 @@ const struct pmm_manager default_pmm_manager = {
     .check = default_check,
 };
 
-/* search for a proper positon in free_list to place new memory block*/
-static void 
-insert2free_list(list_entry_t *elem){
-   list_entry_t *le = &free_list;
-    while((le = list_next(le)) != &free_list){
-        if(elem < le){
-            list_add_before(le, elem);
-            break;
-        }
-    }
-    if(le == &free_list) list_add_before(le, elem);
-}
