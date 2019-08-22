@@ -246,7 +246,7 @@ gdb:
 debug: targets
 	$(V)$(QEMU) -S -s -parallel stdio $(QEMUOPTS) -serial null &
 	$(V)sleep 2
-	$(V)$(TERMINAL) -e "gdb -q -x tools/gdbinit"
+	$(V)$(TERMINAL) -e "gdb -q -tui -x tools/gdbinit"
 
 debug-mon: targets
 	$(V)$(QEMU) -S -s -monitor stdio $(QEMUOPTS) -parallel null -serial null
