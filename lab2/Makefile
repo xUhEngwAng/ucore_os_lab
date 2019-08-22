@@ -229,7 +229,7 @@ targets: $(TARGETS)
 .DEFAULT_GOAL := targets
 
 QEMUOPTS = -hda $(UCOREIMG)
-TERMINAL := gnome-termial
+TERMINAL := gnome-terminal
 
 .PHONY: qemu qemu-nox gdb debug debug-mon debug-nox
 qemu-mon: targets
