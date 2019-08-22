@@ -242,10 +242,8 @@ qemu-nox: targets
 gdb:
 	$(V)$(GDB) -q -x tools/gdbinit
 
-debug: $(UCOREIMG)
-	$(V)$(QEMU) -S -s -parallel stdio -hda $< -serial null &
-	$(V)sleep 2
-	$(V)$(TERMINAL) -e "gdb -q -tui -x tools/gdbinit"
+debug: targets
+	$(V)$(QEMU) -S -s -parallel stdio $(QEMUOPTS) -serial null
 
 debug-mon: targets
 	$(V)$(QEMU) -S -s -monitor stdio $(QEMUOPTS) -parallel null -serial null
