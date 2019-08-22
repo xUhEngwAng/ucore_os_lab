@@ -229,6 +229,7 @@ targets: $(TARGETS)
 .DEFAULT_GOAL := targets
 
 QEMUOPTS = -hda $(UCOREIMG)
+TERMINAL := gnome-termial
 
 .PHONY: qemu qemu-nox gdb debug debug-mon debug-nox
 qemu-mon: targets
@@ -244,6 +245,8 @@ gdb:
 
 debug: targets
 	$(V)$(QEMU) -S -s -parallel stdio $(QEMUOPTS) -serial null
+	$(V)sleep 2
+	$(V)$(TERMINAL) -e "gdb -q -x tools/gdbinit"
 
 debug-mon: targets
 	$(V)$(QEMU) -S -s -monitor stdio $(QEMUOPTS) -parallel null -serial null
