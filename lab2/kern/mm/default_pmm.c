@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <pmm.h>
 #include <list.h>
 #include <string.h>
@@ -60,12 +61,12 @@ free_area_t free_area;
 #define nr_free (free_area.nr_free)
 
 /*print current free_area*/
-static void
+void
 print_free_area(){
     list_entry_t *le = &free_list;
     struct Page* p;
     int count = 0;
-    while((le = list_next(le)) != free_list){
+    while((le = list_next(le)) != &free_list){
         p = le2page(le, page_link);
         cprintf("%d:property(%d), [%d, %d]\n", count++, p->property, page2ppn(p), page2ppn(p) + p->property);
     }
