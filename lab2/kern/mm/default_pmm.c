@@ -59,6 +59,18 @@ free_area_t free_area;
 #define free_list (free_area.free_list)
 #define nr_free (free_area.nr_free)
 
+/*print current free_area*/
+static void
+print_free_area(){
+    list_entry_t *le = &free_list;
+    struct Page* p;
+    int count = 0;
+    while((le = list_next(le)) != free_list){
+        p = le2page(le, page_link);
+        cprintf("%d:property(%d), [%d, %d]\n", count++, p->property, page2ppn(p), page2ppn(p) + p->property);
+    }
+}
+
 
 /* search for a proper positon in free_list to place new memory block*/
 static void 
@@ -91,6 +103,7 @@ default_init_memmap(struct Page *base, size_t n) {
     base->property = n;
     SetPageProperty(base);
     nr_free += n;
+    cprintf("current number of free pages: %d\n", nr_free);
     insert2free_list(&(base->page_link));
 }
 

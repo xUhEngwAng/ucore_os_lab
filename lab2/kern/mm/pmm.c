@@ -222,9 +222,11 @@ page_init(void) {
     }
 
     uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
+    cprintf("base address of free memory: %08llx\n", freemem);
 
     for (i = 0; i < memmap->nr_map; i ++) {
         uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;
+        cprintf("[begin, end]: [%08llx, %08llx]\n", begin, end);
         if (memmap->map[i].type == E820_ARM) {
             if (begin < freemem) {
                 begin = freemem;
@@ -241,6 +243,7 @@ page_init(void) {
             }
         }
     }
+    print_free_area();
 }
 
 static void
