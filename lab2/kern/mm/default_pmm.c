@@ -149,10 +149,9 @@ default_free_pages(struct Page *base, size_t n) {
     }
     base->property = n;
     SetPageProperty(base);
-    list_entry_t *le = list_next(&free_list);
-    while (le != &free_list) {
+    list_entry_t *le = &free_list;
+    while ((le = list_next(le)) != &free_list) {
         p = le2page(le, page_link);
-        le = list_next(le);
         if(base < p){
             list_add_before(&(p->page_link), &(base->page_link));
             if(base + base->property == p){
