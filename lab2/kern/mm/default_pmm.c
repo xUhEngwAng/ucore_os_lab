@@ -65,10 +65,11 @@ void
 print_free_area(){
     list_entry_t *le = &free_list;
     struct Page* p;
-    int count = 0;
+    int count = 1;
+    cprintf("free area: \n")
     while((le = list_next(le)) != &free_list){
         p = le2page(le, page_link);
-        cprintf("%d:property(%d), [%d, %d]\n", count++, p->property, page2ppn(p), page2ppn(p) + p->property);
+        cprintf("  %d:property(%d), [%d, %d]\n", count++, p->property, page2ppn(p), page2ppn(p) + p->property);
     }
 }
 
@@ -245,10 +246,14 @@ basic_check(void) {
     assert(nr_free == 0);
     free_list = free_list_store;
     nr_free = nr_free_store;
+    print_free_area();
 
     free_page(p);
+    print_free_area();
     free_page(p1);
+    print_free_area();
     free_page(p2);
+    print_free_area();
 }
 
 // LAB2: below code is used to check the first fit allocation algorithm (your EXERCISE 1) 
