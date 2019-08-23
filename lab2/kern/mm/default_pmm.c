@@ -66,7 +66,7 @@ print_free_area(){
     list_entry_t *le = &free_list;
     struct Page* p;
     int count = 1;
-    cprintf("free area: \n")
+    cprintf("free area: \n");
     while((le = list_next(le)) != &free_list){
         p = le2page(le, page_link);
         cprintf("  %d:property(%d), [%d, %d]\n", count++, p->property, page2ppn(p), page2ppn(p) + p->property);
