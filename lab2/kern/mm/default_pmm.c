@@ -129,7 +129,6 @@ default_alloc_pages(size_t n) {
         if (page->property > n) {
             p = page + n;
             p->property = page->property - n;
-            //list_add(&free_list, &(p->page_link));
             insert2free_list(&(p->page_link));
         }
         nr_free -= n;
@@ -169,17 +168,6 @@ default_free_pages(struct Page *base, size_t n) {
             }
             break;
         }
-        /*if (base + base->property == p) {
-            base->property += p->property;
-            ClearPageProperty(p);
-            list_del(&(p->page_link));
-        }
-        else if (p + p->property == base) {
-            p->property += base->property;
-            ClearPageProperty(base);
-            base = p;
-            list_del(&(p->page_link));
-        }*/
     }
     if(le == &free_list){
         list_add_before(&free_list, &(base->page_link));
