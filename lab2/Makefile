@@ -202,7 +202,7 @@ UCOREIMG	:= $(call totarget,ucore.img)
 $(UCOREIMG): $(kernel) $(bootblock) $(kernel_nopage)
 	$(V)dd if=/dev/zero of=$@ count=10000
 	$(V)dd if=$(bootblock) of=$@ conv=notrunc
-	$(V)dd if=$(kernel_nopage) of=$@ seek=1 conv=notrunc
+	$(V)dd if=$(kernel) of=$@ seek=1 conv=notrunc
 
 $(call create_target,ucore.img)
 
