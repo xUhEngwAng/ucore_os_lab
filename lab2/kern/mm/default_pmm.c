@@ -125,12 +125,12 @@ default_alloc_pages(size_t n) {
         }
     }
     if (page != NULL) {
-        list_del(&(page->page_link));
         if (page->property > n) {
             p = page + n;
             p->property = page->property - n;
-            insert2free_list(&(p->page_link));
+            list_add(&(page->page_link), &(p->page_link));
         }
+        list_del(&(page->page_link));
         nr_free -= n;
         ClearPageProperty(page);
     }
