@@ -111,7 +111,7 @@ alloc_proc(void) {
       proc->parent = NULL;
       proc->mm     = NULL;
       proc->tf     = NULL;
-      proc->name   = "undefined";
+      set_proc_name(proc, "undefined");
       proc->need_resched = 0;
       proc->context.eip = 0;
       proc->context.esp = 0;
@@ -320,7 +320,7 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     copy_mm(clone_flags, proc);
     copy_thread(proc, stack, tf);
     hash_proc(proc);
-    list_add(&proc_list, proc->list_link);
+    list_add(&proc_list, &(proc->list_link));
     wakeup_proc(proc);
     proc->pid = get_pid();
     ++nr_process;
