@@ -6,6 +6,7 @@
 #include <memlayout.h>
 #include <pmm.h>
 #include <mmu.h>
+#include <default_pmm.h>
 
 // the valid vaddr for check is between 0~CHECK_VALID_VADDR-1
 #define CHECK_VALID_VIR_PAGE_NUM 5
@@ -178,6 +179,7 @@ static void
 check_swap(void)
 {
     //backup mem env
+    print_free_area();
      int ret, count = 0, total = 0, i;
      list_entry_t *le = &free_list;
      while ((le = list_next(le)) != &free_list) {

@@ -5,5 +5,7 @@
 
 extern const struct pmm_manager default_pmm_manager;
 
+void print_free_area();
+
 #endif /* ! __KERN_MM_DEFAULT_PMM_H__ */
 

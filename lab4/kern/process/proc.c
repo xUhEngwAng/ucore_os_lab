@@ -317,12 +317,12 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     //    7. set ret vaule using child proc's pid
     proc = alloc_proc();
     setup_kstack(proc);
+    proc->pid = get_pid();
     copy_mm(clone_flags, proc);
     copy_thread(proc, stack, tf);
     hash_proc(proc);
     list_add(&proc_list, &(proc->list_link));
     wakeup_proc(proc);
-    proc->pid = get_pid();
     ++nr_process;
     ret = proc->pid;
 fork_out:
