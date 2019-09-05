@@ -179,7 +179,6 @@ static void
 check_swap(void)
 {
     //backup mem env
-    print_free_area();
      int ret, count = 0, total = 0, i;
      list_entry_t *le = &free_list;
      while ((le = list_next(le)) != &free_list) {
