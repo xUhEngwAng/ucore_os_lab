@@ -55,16 +55,15 @@ idt_init(void) {
       */
 	extern uintptr_t __vectors[];
 	
-	asm volatile("movw %%cs, %0":"=r"(cs));
 	uint32_t ix;
 	for(ix = 0; ix < 256; ++ix)
 		SETGATE(idt[ix], 0, KERNEL_CS, __vectors[ix], DPL_KERNEL);
-    SETCALLGATE(idt[T_SYSCALL], KERNEL_CS, __vectors[T_SYSCALL], DPL_USER);
 	
 	lidt(&idt_pd);
      /* LAB5 YOUR CODE */ 
      //you should update your lab1 code (just add ONE or TWO lines of code), let user app to use syscall to get the service of ucore
      //so you should setup the syscall interrupt gate in here
+    SETGATE(idt[T_SYSCALL], 1, KERNEL_CS, __vectors[T_SYSCALL], DPL_USER);
 }
 
 static const char *

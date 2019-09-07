@@ -439,7 +439,6 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
         proc->pid = get_pid();
         set_links(proc);
         hash_proc(proc);
-        nr_process ++;
     }
     local_intr_restore(intr_flag);
 
@@ -657,7 +656,7 @@ load_icode(unsigned char *binary, size_t size) {
     tf->tf_es = USER_DS;
     tf->tf_ss = USER_DS;
     tf->tf_esp = USTACKTOP;
-    tf->tf_ip = elf->e_entry;
+    tf->tf_eip = elf->e_entry;
     tf->tf_eflags = FL_IF;
     ret = 0;
 out:
@@ -672,7 +671,7 @@ bad_mm:
     goto out;
 }
 
-// do_execve - call exit_mmap(mm)&pug_pgdir(mm) to reclaim memory space of current process
+// do_execve - call exit_mmap(mm)&put_pgdir(mm) to reclaim memory space of current process
 //           - call load_icode to setup new memory space accroding to binary prog.
 int
 do_execve(const char *name, size_t len, unsigned char *binary, size_t size) {
@@ -718,7 +717,7 @@ do_yield(void) {
 
 // do_wait - wait one OR any children with PROC_ZOMBIE state, and free memory space of kernel stack
 //         - proc struct of this child.
-// NOTE: only after do_wait function, all resources of the child proces are free.
+// NOTE: only after do_wait function, all resources of the child process are free.
 int
 do_wait(int pid, int *code_store) {
     struct mm_struct *mm = current->mm;
