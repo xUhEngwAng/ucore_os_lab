@@ -128,6 +128,10 @@ alloc_proc(void) {
      *       uint32_t wait_state;                        // waiting state
      *       struct proc_struct *cptr, *yptr, *optr;     // relations between processes
 	 */
+      proc->wait_state = 0;
+      proc->cptr = NULL;
+      proc->yptr = NULL;
+      proc->optr = NULL;
     }
     return proc;
 }
@@ -419,6 +423,7 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     }
 
     proc->parent = current;
+    proc->wait_state = 0;
 
     if (setup_kstack(proc) != 0) {
         goto bad_fork_cleanup_proc;
@@ -432,8 +437,8 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     local_intr_save(intr_flag);
     {
         proc->pid = get_pid();
+        set_links(proc);
         hash_proc(proc);
-        list_add(&proc_list, &(proc->list_link));
         nr_process ++;
     }
     local_intr_restore(intr_flag);
@@ -445,8 +450,8 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
    /* Some Functions
     *    set_links:  set the relation links of process.  ALSO SEE: remove_links:  lean the relation links of process 
     *    -------------------
-	*    update step 1: set child proc's parent to current process, make sure current process's wait_state is 0
-	*    update step 5: insert proc_struct into hash_list && proc_list, set the relation links of process
+	  *    update step 1: set child proc's parent to current process, make sure current process's wait_state is 0
+	  *    update step 5: insert proc_struct into hash_list && proc_list, set the relation links of process
     */
 	
 fork_out:
@@ -629,7 +634,7 @@ load_icode(unsigned char *binary, size_t size) {
     assert(pgdir_alloc_page(mm->pgdir, USTACKTOP-3*PGSIZE , PTE_USER) != NULL);
     assert(pgdir_alloc_page(mm->pgdir, USTACKTOP-4*PGSIZE , PTE_USER) != NULL);
     
-    //(5) set current process's mm, sr3, and set CR3 reg = physical addr of Page Directory
+    //(5) set current process's mm, cr3, and set CR3 reg = physical addr of Page Directory
     mm_count_inc(mm);
     current->mm = mm;
     current->cr3 = PADDR(mm->pgdir);
@@ -647,6 +652,13 @@ load_icode(unsigned char *binary, size_t size) {
      *          tf_eip should be the entry point of this binary program (elf->e_entry)
      *          tf_eflags should be set to enable computer to produce Interrupt
      */
+    tf->tf_cs = USER_CS;
+    tf->tf_ds = USER_DS;
+    tf->tf_es = USER_DS;
+    tf->tf_ss = USER_DS;
+    tf->tf_esp = USTACKTOP;
+    tf->tf_ip = elf->e_entry;
+    tf->tf_eflags = FL_IF;
     ret = 0;
 out:
     return ret;
@@ -661,7 +673,7 @@ bad_mm:
 }
 
 // do_execve - call exit_mmap(mm)&pug_pgdir(mm) to reclaim memory space of current process
-//           - call load_icode to setup new memory space accroding binary prog.
+//           - call load_icode to setup new memory space accroding to binary prog.
 int
 do_execve(const char *name, size_t len, unsigned char *binary, size_t size) {
     struct mm_struct *mm = current->mm;

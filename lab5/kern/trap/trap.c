@@ -55,11 +55,11 @@ idt_init(void) {
       */
 	extern uintptr_t __vectors[];
 	
-	uint16_t cs;
 	asm volatile("movw %%cs, %0":"=r"(cs));
 	uint32_t ix;
 	for(ix = 0; ix < 256; ++ix)
-		SETGATE(idt[ix], 0, cs, __vectors[ix], 0);
+		SETGATE(idt[ix], 0, KERNEL_CS, __vectors[ix], DPL_KERNEL);
+    SETCALLGATE(idt[T_SYSCALL], KERNEL_CS, __vectors[T_SYSCALL], DPL_USER);
 	
 	lidt(&idt_pd);
      /* LAB5 YOUR CODE */ 
@@ -237,6 +237,7 @@ trap_dispatch(struct trapframe *tf) {
         /* you should upate you lab1 code (just add ONE or TWO lines of code):
          *    Every TICK_NUM cycle, you should set current process's current->need_resched = 1
          */
+        current->need_resched = 1;
   
         break;
     case IRQ_OFFSET + IRQ_COM1:

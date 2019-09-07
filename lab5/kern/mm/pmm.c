@@ -464,7 +464,7 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
         if(page->ref == 0){
             free_page(page);
         }
-        *ptep = *ptep & ~PTE_P;
+        *ptep = 0;
         tlb_invalidate(pgdir, la);
     }
 }
@@ -548,6 +548,10 @@ copy_range(pde_t *to, pde_t *from, uintptr_t start, uintptr_t end, bool share) {
          * (3) memory copy from src_kvaddr to dst_kvaddr, size is PGSIZE
          * (4) build the map of phy addr of  nage with the linear addr start
          */
+        void* src_kvaddr = page2kva(page);
+        void* dst_kvaddr = page2kva(npage);
+        memcpy(dst_kvaddr, src_kvaddr);
+        page_insert(to, npage, start, perm);
         assert(ret == 0);
         }
         start += PGSIZE;
