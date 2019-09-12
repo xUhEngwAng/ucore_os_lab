@@ -34,7 +34,7 @@ struct mm_struct {
     pde_t *pgdir;                  // the PDT of these vma
     int map_count;                 // the count of these vma
     void *sm_priv;                 // the private data for swap manager
-    int mm_count;                  // the number ofprocess which shared the mm
+    int mm_count;                  // the number of process which shared the mm
     lock_t mm_lock;                // mutex for using dup_mmap fun to duplicat the mm
 };
 
