@@ -70,7 +70,7 @@ stride_enqueue(struct run_queue *rq, struct proc_struct *proc) {
       * (3) set proc->rq pointer to rq
       * (4) increase rq->proc_num
       */
-      skew_heap_insert(rq->lab6_run_pool, &proc->lab6_run_pool, proc_stride_comp_f);
+      rq->lab6_run_pool = skew_heap_insert(rq->lab6_run_pool, &(proc->lab6_run_pool), proc_stride_comp_f);
       if (proc->time_slice == 0 || proc->time_slice > rq->max_time_slice) {
         proc->time_slice = rq->max_time_slice;
       }
@@ -119,9 +119,13 @@ stride_pick_next(struct run_queue *rq) {
       * (2) update p's stride value: p->lab6_stride
       * (3) return p
       */
-      if(rq->lab6_run_pool == NULL) return NULL;
+      if (rq->lab6_run_pool == NULL) return NULL;
       struct proc_struct *p = le2proc(rq->lab6_run_pool, lab6_run_pool);
-      p->lab6_stride += BIG_STRIDE / p->lab6_priority;
+      if(p->lab6_priority == 0){//for kernel thread
+        p->lab6_stride += BIG_STRIDE;
+      }
+      else
+        p->lab6_stride += BIG_STRIDE / p->lab6_priority;
       return p;
 }
 
