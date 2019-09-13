@@ -145,6 +145,9 @@ alloc_proc(void) {
       proc->rq = NULL;
       list_init(&(proc->run_link));
       proc->time_slice = MAX_TIME_SLICE;
+      skew_heap_init(&(proc->lab6_run_pool));
+      proc->lab6_stride = 0;
+      proc->lab6_priority = 0;
     }
     return proc;
 }

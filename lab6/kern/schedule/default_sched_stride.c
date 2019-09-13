@@ -120,7 +120,7 @@ stride_pick_next(struct run_queue *rq) {
       * (3) return p
       */
       if(rq->lab6_run_pool == NULL) return NULL;
-      proc_struct *p = le2proc(rq->lab6_run_pool, lab6_run_pool);
+      struct proc_struct *p = le2proc(rq->lab6_run_pool, lab6_run_pool);
       p->lab6_stride += BIG_STRIDE / p->lab6_priority;
       return p;
 }
