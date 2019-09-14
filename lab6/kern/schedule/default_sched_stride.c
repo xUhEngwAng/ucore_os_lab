@@ -1,6 +1,7 @@
 #include <defs.h>
 #include <list.h>
 #include <proc.h>
+#include <stdio.h>
 #include <assert.h>
 #include <default_sched.h>
 
@@ -8,7 +9,7 @@
 
 /* You should define the BigStride constant here*/
 /* LAB6: YOUR CODE */
-#define BIG_STRIDE   (1 << 30)/* you should give a value, and is ??? */
+#define BIG_STRIDE   (120)/* you should give a value, and is ??? */
 
 /* The compare function for two skew_heap_node_t's and the
  * corresponding procs*/
@@ -76,6 +77,7 @@ stride_enqueue(struct run_queue *rq, struct proc_struct *proc) {
       }
       proc->rq = rq;
       rq->proc_num++;
+      cprintf("enqueue process pid: %d, priority: %d, stride: %d\n", proc->pid, proc->lab6_priority, proc->lab6_stride);
 }
 
 /*
@@ -126,6 +128,8 @@ stride_pick_next(struct run_queue *rq) {
       }
       else
         p->lab6_stride += BIG_STRIDE / p->lab6_priority;
+      cprintf("pick process pid: %d, priority: %d, stride: %d\n", p->pid, p->lab6_priority, p->lab6_stride);
+
       return p;
 }
 
