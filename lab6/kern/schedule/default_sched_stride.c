@@ -9,7 +9,7 @@
 
 /* You should define the BigStride constant here*/
 /* LAB6: YOUR CODE */
-#define BIG_STRIDE   (120)/* you should give a value, and is ??? */
+#define BIG_STRIDE   (1 << 30)/* you should give a value, and is ??? */
 
 /* The compare function for two skew_heap_node_t's and the
  * corresponding procs*/
@@ -19,8 +19,8 @@ proc_stride_comp_f(void *a, void *b)
       struct proc_struct *p = le2proc(a, lab6_run_pool);
       struct proc_struct *q = le2proc(b, lab6_run_pool);
       int32_t c = p->lab6_stride - q->lab6_stride;
-      if (c > 0 && c < BIG_STRIDE)  return 1;
-      if (c < 0 && c > -BIG_STRIDE) return 1;
+      if (c > 0 && c <= BIG_STRIDE)  return 1;
+      if (c < -BIG_STRIDE) return 1;
       if (c == 0) return 0;
       return -1;
 }
