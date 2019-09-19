@@ -46,10 +46,10 @@ void
 sched_init(void) {
     list_init(&timer_list);
 
-    sched_class = &default_sched_class;
+    sched_class = &default_sched_stride_class;
 
     rq = &__rq;
-    rq->max_time_slice = 20;
+    rq->max_time_slice = MAX_TIME_SLICE;
     sched_class->init(rq);
 
     cprintf("sched class: %s\n", sched_class->name);
