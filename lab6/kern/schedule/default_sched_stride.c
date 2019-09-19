@@ -76,7 +76,7 @@ stride_enqueue(struct run_queue *rq, struct proc_struct *proc) {
       }
       proc->rq = rq;
       rq->proc_num++;
-      cprintf("enqueue process pid: %d, priority: %d, stride: %d\n", proc->pid, proc->lab6_priority, proc->lab6_stride);
+      //cprintf("enqueue process pid: %d, priority: %d, stride: %d\n", proc->pid, proc->lab6_priority, proc->lab6_stride);
 }
 
 /*
@@ -127,7 +127,7 @@ stride_pick_next(struct run_queue *rq) {
       }
       else
         p->lab6_stride += BIG_STRIDE / p->lab6_priority;
-      cprintf("pick process pid: %d, priority: %d, stride: %d\n", p->pid, p->lab6_priority, p->lab6_stride);
+      //cprintf("pick process pid: %d, priority: %d, stride: %d\n", p->pid, p->lab6_priority, p->lab6_stride);
 
       return p;
 }

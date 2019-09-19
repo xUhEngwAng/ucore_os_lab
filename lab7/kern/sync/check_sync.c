@@ -23,8 +23,8 @@ struct proc_struct *philosopher_proc_sema[N];
 
 void phi_test_sema(i) /* i：哲学家号码从0到N-1 */
 { 
-    if(state_sema[i]==HUNGRY&&state_sema[LEFT]!=EATING
-            &&state_sema[RIGHT]!=EATING)
+    if(state_sema[i]==HUNGRY && state_sema[LEFT]!=EATING
+             && state_sema[RIGHT]!=EATING)
     {
         state_sema[i]=EATING;
         up(&s[i]);
