@@ -67,7 +67,7 @@
 typedef struct monitor monitor_t;
 
 typedef struct condvar{
-    semaphore_t sem;        // the sem semaphore  is used to down the waiting proc, and the signaling proc should up the waiting proc
+    semaphore_t sem;        // the sem semaphore is used to down the waiting proc, and the signaling proc should up the waiting proc
     int count;              // the number of waiters on condvar
     monitor_t * owner;      // the owner(monitor) of this condvar
 } condvar_t;
