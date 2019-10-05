@@ -135,7 +135,7 @@ fd2file(int fd, struct file **file_store) {
     return -E_INVAL;
 }
 
-// file_testfd - test file is readble or writable?
+// file_testfd - test file is readable or writable?
 bool
 file_testfd(int fd, bool readable, bool writable) {
     int ret;

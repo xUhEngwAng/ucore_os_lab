@@ -74,7 +74,7 @@ void inode_kill(struct inode *node);
 #define VOP_MAGIC                           0x8c4ba476
 
 /*
- * Abstract operations on a inode.
+ * Abstract operations on an inode.
  *
  * These are used in the form VOP_FOO(inode, args), which are macros
  * that expands to inode->inode_ops->vop_foo(inode, args). The operations

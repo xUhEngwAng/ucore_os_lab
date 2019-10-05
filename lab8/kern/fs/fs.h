@@ -20,7 +20,7 @@ struct inode;
 struct file;
 
 /*
- * process's file related informaction
+ * process's file related information
  */
 struct files_struct {
     struct inode *pwd;      // inode of present working directory

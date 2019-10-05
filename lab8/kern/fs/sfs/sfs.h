@@ -83,7 +83,7 @@ struct sfs_inode {
 struct sfs_fs {
     struct sfs_super super;                         /* on-disk superblock */
     struct device *dev;                             /* device mounted on */
-    struct bitmap *freemap;                         /* blocks in use are mared 0 */
+    struct bitmap *freemap;                         /* blocks in use are maped 0 */
     bool super_dirty;                               /* true if super/freemap modified */
     void *sfs_buffer;                               /* buffer for non-block aligned io */
     semaphore_t fs_sem;                             /* semaphore for fs */

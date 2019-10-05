@@ -8,7 +8,7 @@ struct iobuf;
 
 /*
  * Filesystem-namespace-accessible device.
- * d_io is for both reads and writes; the iobuf will indicates the direction.
+ * d_io is for both reads and writes; the iobuf will indicate the direction.
  */
 struct device {
     size_t d_blocks;
