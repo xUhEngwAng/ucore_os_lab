@@ -126,7 +126,8 @@ void phi_take_forks_condvar(int i) {
      // try to get fork
      state_condvar[i] = HUNGRY;
      phi_test_condvar(i);
-     cond_wait(&(mtp->cv[i]));
+     if(state_condvar[i] != EATING)
+        cond_wait(&(mtp->cv[i]));
 //--------leave routine in monitor--------------
       if(mtp->next_count>0)
          up(&(mtp->next));
