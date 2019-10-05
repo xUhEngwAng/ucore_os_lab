@@ -199,7 +199,12 @@ nr_free_pages(void) {
     return ret;
 }
 
-/* pmm_init - initialize the physical memory management */
+/* page_init - initialize the physical memory management */
+/* functionality: 
+ * I.   restore 820map in physical address & gather some information, such as # of pages and max physical address.
+ * II.  construct a struct `Page` for each physical page frame.
+ * III. initialize memory map by constructing `free_area` variable.
+ */
 static void
 page_init(void) {
     struct e820map *memmap = (struct e820map *)(0x8000 + KERNBASE);
@@ -376,7 +381,7 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
      *   KADDR(pa) : takes a physical address and returns the corresponding kernel virtual address.
      *   set_page_ref(page,1) : means the page be referenced by one time
      *   page2pa(page): get the physical address of memory which this (struct Page *) page  manages
-     *   struct Page * alloc_page() : allocation a page
+     *   struct Page * alloc_page() : allocate a page
      *   memset(void *s, char c, size_t n) : sets the first n bytes of the memory area pointed by s
      *                                       to the specified value c.
      * DEFINEs:
@@ -396,6 +401,17 @@ get_pte(pde_t *pgdir, uintptr_t la, bool create) {
     }
     return NULL;          // (8) return page table entry
 #endif
+    pde_t *pde = pgdir + PDX(la);
+    struct Page* p;
+    if(!(*pde & PTE_P)){
+        if(!create || (p = alloc_page()) == NULL) return NULL;
+        //else allocate a new page for page table
+        *pde = page2pa(p);
+        *pde = *pde | PTE_P | PTE_U | PTE_W;
+        set_page_ref(p, 1);
+        memset(page2kva(p), 0, PGSIZE);
+    }
+    return ((pte_t*)KADDR(PDE_ADDR(*pde))) + PTX(la);
 }
 
 //get_page - get related Page struct for linear address la using PDT pgdir
@@ -411,9 +427,9 @@ get_page(pde_t *pgdir, uintptr_t la, pte_t **ptep_store) {
     return NULL;
 }
 
-//page_remove_pte - free an Page sturct which is related linear address la
-//                - and clean(invalidate) pte which is related linear address la
-//note: PT is changed, so the TLB need to be invalidate 
+//page_remove_pte - free a Page sturct which is related to linear address la
+//                - and clean(invalidate) pte which is related to linear address la
+//note: PT is changed, so the TLB needs to be invalidated
 static inline void
 page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
     /* LAB2 EXERCISE 3: YOUR CODE
@@ -441,6 +457,16 @@ page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
                                   //(6) flush tlb
     }
 #endif
+    //assert(ptep == get_pte(la));
+    if(ptep != NULL && (*ptep & PTE_P)){
+        struct Page* page = pte2page(*ptep);
+        page_ref_dec(page);
+        if(page->ref == 0){
+            free_page(page);
+        }
+        *ptep = 0;
+        tlb_invalidate(pgdir, la);
+    }
 }
 
 void
@@ -522,6 +548,10 @@ copy_range(pde_t *to, pde_t *from, uintptr_t start, uintptr_t end, bool share) {
          * (3) memory copy from src_kvaddr to dst_kvaddr, size is PGSIZE
          * (4) build the map of phy addr of  nage with the linear addr start
          */
+        void* src_kvaddr = page2kva(page);
+        void* dst_kvaddr = page2kva(npage);
+        memcpy(dst_kvaddr, src_kvaddr, PGSIZE);
+        page_insert(to, npage, start, perm);
         assert(ret == 0);
         }
         start += PGSIZE;
@@ -545,7 +575,7 @@ page_remove(pde_t *pgdir, uintptr_t la) {
 //  la:    the linear address need to map
 //  perm:  the permission of this Page which is setted in related pte
 // return value: always 0
-//note: PT is changed, so the TLB need to be invalidate 
+//note: PT is changed, so the TLB needs to be invalidated
 int
 page_insert(pde_t *pgdir, struct Page *page, uintptr_t la, uint32_t perm) {
     pte_t *ptep = get_pte(pgdir, la, 1);

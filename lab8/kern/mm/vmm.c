@@ -451,12 +451,11 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
     *   mm->pgdir : the PDT of these vma
     *
     */
-#if 0
-    /*LAB3 EXERCISE 1: YOUR CODE*/
-    ptep = ???              //(1) try to find a pte, if pte's PT(Page Table) isn't existed, then create a PT.
-    if (*ptep == 0) {
-                            //(2) if the phy addr isn't exist, then alloc a page & map the phy addr with logical addr
 
+    /*LAB3 EXERCISE 1: YOUR CODE*/
+    ptep = get_pte(mm->pgdir, addr, 1);                   //(1) try to find a pte, if pte's PT(Page Table) isn't existed, then create a PT.
+    if (*ptep == 0) {
+        pgdir_alloc_page(mm->pgdir, addr, perm | PTE_P);  //(2) if the phy addr isn't exist, then alloc a page & map the phy addr with logical addr
     }
     else {
     /*LAB3 EXERCISE 2: YOUR CODE
@@ -486,13 +485,17 @@ do_pgfault(struct mm_struct *mm, uint32_t error_code, uintptr_t addr) {
                                     //(2) According to the mm, addr AND page, setup the map of phy addr <---> logical addr
                                     //(3) make the page swappable.
                                     //(4) [NOTICE]: you myabe need to update your lab3's implementation for LAB5's normal execution.
-        }
+			swap_in(mm, addr, &page);
+            page->pra_vaddr = addr;
+            page_insert(mm->pgdir, page, addr, perm | PTE_P);
+            swap_map_swappable(mm, addr, page, 0);		        
+		}
         else {
             cprintf("no swap_init_ok but ptep is %x, failed\n",*ptep);
             goto failed;
         }
    }
-#endif
+
    ret = 0;
 failed:
     return ret;
