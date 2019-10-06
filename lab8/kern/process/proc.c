@@ -453,7 +453,33 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     //    5. insert proc_struct into hash_list && proc_list
     //    6. call wakup_proc to make the new child process RUNNABLE
     //    7. set ret vaule using child proc's pid
+    if ((proc = alloc_proc()) == NULL) {
+        goto fork_out;
+    }
 
+    proc->parent = current;
+    proc->wait_state = 0;
+
+    if (setup_kstack(proc) != 0) {
+        goto bad_fork_cleanup_proc;
+    }
+    if (copy_mm(clone_flags, proc) != 0) {
+        goto bad_fork_cleanup_kstack;
+    }
+    copy_thread(proc, stack, tf);
+
+    bool intr_flag;
+    local_intr_save(intr_flag);
+    {
+        proc->pid = get_pid();
+        set_links(proc);
+        hash_proc(proc);
+    }
+    local_intr_restore(intr_flag);
+
+    wakeup_proc(proc);
+
+    ret = proc->pid;
 	//LAB5 YOUR CODE : (update LAB4 steps)
    /* Some Functions
     *    set_links:  set the relation links of process.  ALSO SEE: remove_links:  lean the relation links of process 
@@ -609,8 +635,8 @@ failed_cleanup:
     return ret;
 }
 
-// do_execve - call exit_mmap(mm)&pug_pgdir(mm) to reclaim memory space of current process
-//           - call load_icode to setup new memory space accroding binary prog.
+// do_execve - call exit_mmap(mm)&put_pgdir(mm) to reclaim memory space of current process
+//           - call load_icode to setup new memory space accroding to binary prog.
 int
 do_execve(const char *name, int argc, const char **argv) {
     static_assert(EXEC_MAX_ARG_LEN >= FS_MAX_FPATH_LEN);
@@ -682,7 +708,7 @@ do_yield(void) {
 
 // do_wait - wait one OR any children with PROC_ZOMBIE state, and free memory space of kernel stack
 //         - proc struct of this child.
-// NOTE: only after do_wait function, all resources of the child proces are free.
+// NOTE: only after do_wait function, all resources of the child process are free.
 int
 do_wait(int pid, int *code_store) {
     struct mm_struct *mm = current->mm;
