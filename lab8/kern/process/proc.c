@@ -106,12 +106,35 @@ alloc_proc(void) {
      *       uint32_t flags;                             // Process flag
      *       char name[PROC_NAME_LEN + 1];               // Process name
      */
+      proc->state  = PROC_UNINIT;
+      proc->pid    = -1;
+      proc->runs   = 0;
+      proc->kstack = 0;
+      proc->cr3    = boot_cr3;
+      proc->flags  = 0;
+      proc->parent = NULL;
+      proc->mm     = NULL;
+      proc->tf     = NULL;
+      set_proc_name(proc, "undefined");
+      proc->need_resched = 0;
+      proc->context.eip = 0;
+      proc->context.esp = 0;
+      proc->context.ebx = 0;
+      proc->context.ecx = 0;
+      proc->context.edx = 0;
+      proc->context.esi = 0;
+      proc->context.edi = 0;
+      proc->context.ebp = 0;
      //LAB5 YOUR CODE : (update LAB4 steps)
     /*
      * below fields(add in LAB5) in proc_struct need to be initialized	
      *       uint32_t wait_state;                        // waiting state
      *       struct proc_struct *cptr, *yptr, *optr;     // relations between processes
 	 */
+      proc->wait_state = 0;
+      proc->cptr = NULL;
+      proc->yptr = NULL;
+      proc->optr = NULL;
      //LAB6 YOUR CODE : (update LAB5 steps)
     /*
      * below fields(add in LAB6) in proc_struct need to be initialized
@@ -122,6 +145,12 @@ alloc_proc(void) {
      *     uint32_t lab6_stride;                       // FOR LAB6 ONLY: the current stride of the process
      *     uint32_t lab6_priority;                     // FOR LAB6 ONLY: the priority of process, set by lab6_set_priority(uint32_t)
      */
+      proc->rq = NULL;
+      list_init(&(proc->run_link));
+      proc->time_slice = MAX_TIME_SLICE;
+      skew_heap_init(&(proc->lab6_run_pool));
+      proc->lab6_stride = 0;
+      proc->lab6_priority = 0;
     //LAB8:EXERCISE2 YOUR CODE HINT:need add some code to init fs in proc_struct, ...
     }
     return proc;
