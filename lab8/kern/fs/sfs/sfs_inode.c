@@ -586,8 +586,8 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
     int ret = 0;
     size_t size, alen = 0, ix;
     uint32_t ino;
-    uint32_t blkno = offset / SFS_BLKSIZE;          // The NO. of Rd/Wr begin block
-    uint32_t nblks = endpos / SFS_BLKSIZE - blkno;  // The size of Rd/Wr blocks
+    uint32_t blkno = offset / SFS_BLKSIZE;                              // The NO. of Rd/Wr begin block
+    uint32_t nblks = endpos / SFS_BLKSIZE - blkno;                      // The size of Rd/Wr blocks
 
   //LAB8:EXERCISE1 YOUR CODE HINT: call sfs_bmap_load_nolock, sfs_rbuf, sfs_rblock,etc. read different kind of blocks in file
 	/*
@@ -600,26 +600,33 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
 	 *       NOTICE: useful function: sfs_bmap_load_nolock, sfs_buf_op	
 	*/
 
+    uint32_t offset_block = offset - ROUNDDOWN(offset, SFS_BLKSIZE);    // The offset in the content of disk block
+    uint32_t endpos_block = endpos - ROUNDDOWN(endpos, SFS_BLKSIZE);    // The endpos in the content of disk block
+    assert(offset_block <= SFS_BLKSIZE);
+    assert(endpos_block <= SFS_BLKSIZE);
+
     if((ret = sfs_bmap_load_nolock(sfs, sin, blkno++, &ino)) != 0){
         return ret;
     }
-    size = (nblks == 0? endpos - offset: SFS_BLKSIZE - offset);
-    sfs_buf_op(sfs, buf, size, ino, offset);
+    size = (nblks == 0? endpos - offset: SFS_BLKSIZE - offset_block);
+    sfs_buf_op(sfs, buf, size, ino, offset_block);
+    buf  += size;
     alen += size;
 
     for(ix = 0; ix != nblks - 1; ix++){
         if((ret = sfs_bmap_load_nolock(sfs, sin, blkno++, &ino)) != 0){
             return ret;
         }
-        alen += SFS_BLKSIZE;
         sfs_block_op(sfs, buf, ino, 1);
+        buf  += SFS_BLKSIZE;
+        alen += SFS_BLKSIZE;
     }
 
     if(nblks != 0){
-        if((ret = sfs_bmap_load_nolock(sfs, sin, blkno++, &ino)) != 0){
+        if((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0){
             return ret;
         }
-        size = (endpos % SFS_BLKSIZE == 0? SFS_BLKSIZE: endpos);
+        size = (endpos_block == 0? SFS_BLKSIZE : endpos_block);
         sfs_buf_op(sfs, buf, size, ino, 0);
         alen += size;
     }

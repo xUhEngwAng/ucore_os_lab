@@ -45,7 +45,7 @@ sfs_sync(struct fs *fs) {
 }
 
 /*
- * sfs_get_root - get the root directory inode  from disk (SFS_BLKN_ROOT,1)
+ * sfs_get_root - get the root directory inode from disk (SFS_BLKN_ROOT,1)
  */
 static struct inode *
 sfs_get_root(struct fs *fs) {
@@ -116,7 +116,7 @@ sfs_init_read(struct device *dev, uint32_t blkno, void *blk_buffer) {
  * sfs_init_freemap - used in sfs_do_mount to read freemap data info in disk block(blkno, nblks) directly.
  *
  * @dev:        the block device
- * @bitmap:     the bitmap in memroy
+ * @bitmap:     the bitmap in memory
  * @blkno:      the NO. of disk block
  * @nblks:      Rd number of disk block
  * @blk_buffer: the buffer used for read

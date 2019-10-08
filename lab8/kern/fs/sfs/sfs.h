@@ -41,7 +41,7 @@ struct sfs_super {
     uint32_t magic;                                 /* magic number, should be SFS_MAGIC */
     uint32_t blocks;                                /* # of blocks in fs */
     uint32_t unused_blocks;                         /* # of unused blocks in fs */
-    char info[SFS_MAX_INFO_LEN + 1];                /* infomation for sfs  */
+    char info[SFS_MAX_INFO_LEN + 1];                /* information for sfs  */
 };
 
 /* inode (on disk) */
@@ -52,8 +52,8 @@ struct sfs_disk_inode {
     uint32_t blocks;                                /* # of blocks */
     uint32_t direct[SFS_NDIRECT];                   /* direct blocks */
     uint32_t indirect;                              /* indirect blocks */
-//    uint32_t db_indirect;                           /* double indirect blocks */
-//   unused
+//  uint32_t db_indirect;                           /* double indirect blocks */
+//  unused
 };
 
 /* file entry (on disk) */
