@@ -152,6 +152,12 @@ alloc_proc(void) {
       proc->lab6_stride = 0;
       proc->lab6_priority = 0;
     //LAB8:EXERCISE2 YOUR CODE HINT:need add some code to init fs in proc_struct, ...
+      struct files_struct *filesp = kmalloc(sizeof(files_struct));
+      filesp->pwd = NULL;
+      filesp->fd_array = NULL;
+      filesp->files_count = 0;
+      sem_init(filesp->files_sem, 1);
+      proc->filesp = filesp;
     }
     return proc;
 }
