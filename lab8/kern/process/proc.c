@@ -747,9 +747,22 @@ load_icode(int fd, int argc, char **kargv) {
     current->cr3 = PADDR(mm->pgdir);
     lcr3(PADDR(mm->pgdir));
     //(6) setup uargc and uargv in user stacks
-    void* ustack_top = USTACKTOP;
-    *ustack_top-- = kargv;
-    *ustack_top   = argc;
+    uint32_t argv_size=0, i;
+    for (i = 0; i < argc; i ++) {
+        argv_size += strnlen(kargv[i],EXEC_MAX_ARG_LEN + 1)+1;
+    }
+
+    uintptr_t stacktop = USTACKTOP - (argv_size/sizeof(long)+1)*sizeof(long);
+    char** uargv=(char **)(stacktop  - argc * sizeof(char *));
+    
+    argv_size = 0;
+    for (i = 0; i < argc; i ++) {
+        uargv[i] = strcpy((char *)(stacktop + argv_size ), kargv[i]);
+        argv_size +=  strnlen(kargv[i],EXEC_MAX_ARG_LEN + 1)+1;
+    }
+    
+    stacktop = (uintptr_t)uargv - sizeof(int);
+    *(int *)stacktop = argc;
     //(7) setup trapframe for user environment
     struct trapframe *tf = current->tf;
     memset(tf, 0, sizeof(struct trapframe));
@@ -757,7 +770,7 @@ load_icode(int fd, int argc, char **kargv) {
     tf->tf_ds = USER_DS;
     tf->tf_es = USER_DS;
     tf->tf_ss = USER_DS;
-    tf->tf_esp = (uintptr_t)ustack_top;
+    tf->tf_esp = stacktop;
     tf->tf_eip = elf->e_entry;
     tf->tf_eflags = FL_IF;
     ret = 0;
