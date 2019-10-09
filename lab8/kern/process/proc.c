@@ -15,6 +15,7 @@
 #include <fs.h>
 #include <vfs.h>
 #include <sysfile.h>
+#include <stat.h>
 
 /* ------------- process/thread mechanism design&implementation -------------
 (an simplified Linux process/thread mechanism )
@@ -648,10 +649,12 @@ load_icode(int fd, int argc, char **kargv) {
     struct Page *page;
     //(3.1) read raw data content in file and resolve elfhdr
     struct stat *stat;
+    if((stat = kmalloc(sizeof(struct stat))) == NULL)
+      goto bad_cleanup_stat;
     file_fstat(fd, stat);
     void* binary;
     if((binary = kmalloc(stat->st_size) == NULL))
-        goto bad_pgdir_cleanup_mm;
+        goto bad_cleanup_binary;
     load_icode_read(fd, binary, stat->st_size, 0);
     struct elfhdr *elf = (struct elfhdr*)binary;
     //(3.2) read raw data content in file and resolve proghdr based on info in elfhdr
@@ -761,6 +764,10 @@ out:
     return ret;
 bad_cleanup_mmap:
     exit_mmap(mm);
+bad_cleanup_binary:
+    kfree(binary);
+bad_cleanup_stat:
+    kfree(stat);
 bad_elf_cleanup_pgdir:
     put_pgdir(mm);
 bad_pgdir_cleanup_mm:
