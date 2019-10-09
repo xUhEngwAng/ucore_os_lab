@@ -605,15 +605,17 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
     assert(offset_block <= SFS_BLKSIZE);
     assert(endpos_block <= SFS_BLKSIZE);
 
-    if((ret = sfs_bmap_load_nolock(sfs, sin, blkno++, &ino)) != 0){
-        return ret;
+    if(offset_block != offset){
+        if((ret = sfs_bmap_load_nolock(sfs, sin, blkno++, &ino)) != 0){
+            return ret;
+        }
+        size = (nblks == 0? endpos - offset: SFS_BLKSIZE - offset_block);
+        sfs_buf_op(sfs, buf, size, ino, offset_block);
+        buf  += size;
+        alen += size;
     }
-    size = (nblks == 0? endpos - offset: SFS_BLKSIZE - offset_block);
-    sfs_buf_op(sfs, buf, size, ino, offset_block);
-    buf  += size;
-    alen += size;
 
-    for(ix = 0; ix != nblks - 1; ix++){
+    for(ix = 0; ix < nblks - 1; ix++){
         if((ret = sfs_bmap_load_nolock(sfs, sin, blkno++, &ino)) != 0){
             return ret;
         }
@@ -622,11 +624,11 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
         alen += SFS_BLKSIZE;
     }
 
-    if(nblks != 0){
+    if(endpos_block != endpos && nblks != 0){
         if((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0){
             return ret;
         }
-        size = (endpos_block == 0? SFS_BLKSIZE : endpos_block);
+        size = endpos_block;
         sfs_buf_op(sfs, buf, size, ino, 0);
         alen += size;
     }
