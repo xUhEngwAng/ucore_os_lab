@@ -583,8 +583,8 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
         sfs_buf_op = sfs_rbuf, sfs_block_op = sfs_rblock;
     }
 
-    int ret = 0;
-    size_t size, alen = 0, ix;
+    int ret = 0, ix;
+    size_t size, alen = 0;
     uint32_t ino;
     uint32_t blkno = offset / SFS_BLKSIZE;                              // The NO. of Rd/Wr begin block
     uint32_t nblks = endpos / SFS_BLKSIZE - blkno;                      // The size of Rd/Wr blocks
@@ -605,17 +605,15 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
     assert(offset_block <= SFS_BLKSIZE);
     assert(endpos_block <= SFS_BLKSIZE);
 
-    if(offset_block != offset){
-        if((ret = sfs_bmap_load_nolock(sfs, sin, blkno++, &ino)) != 0){
-            return ret;
-        }
-        size = (nblks == 0? endpos - offset: SFS_BLKSIZE - offset_block);
-        sfs_buf_op(sfs, buf, size, ino, offset_block);
-        buf  += size;
-        alen += size;
+    if((ret = sfs_bmap_load_nolock(sfs, sin, blkno++, &ino)) != 0){
+        return ret;
     }
+    size = (nblks == 0? endpos - offset: SFS_BLKSIZE - offset_block);
+    sfs_buf_op(sfs, buf, size, ino, offset_block);
+    buf  += size;
+    alen += size;
 
-    for(ix = 0; ix < nblks - 1; ix++){
+    for(ix = 0; ix + 1 < nblks; ix++){
         if((ret = sfs_bmap_load_nolock(sfs, sin, blkno++, &ino)) != 0){
             return ret;
         }

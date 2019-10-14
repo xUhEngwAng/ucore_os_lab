@@ -229,9 +229,11 @@ trap_dispatch(struct trapframe *tf) {
          * (3) Too Simple? Yes, I think so!
          */
 
+        /*
 		if(++ticks % TICK_NUM == 0){
 			print_ticks();
 		}
+        */
         /* LAB5 YOUR CODE */
         /* you should upate you lab1 code (just add ONE or TWO lines of code):
          *    Every TICK_NUM cycle, you should set current process's current->need_resched = 1
