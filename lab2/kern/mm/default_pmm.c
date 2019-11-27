@@ -73,7 +73,6 @@ print_free_area(){
     }
 }
 
-
 /* search for a proper positon in free_list to place new memory block*/
 static void 
 insert2free_list(list_entry_t *elem){
