@@ -622,7 +622,7 @@ sfs_io_nolock(struct sfs_fs *sfs, struct sfs_inode *sin, void *buf, off_t offset
         alen += SFS_BLKSIZE;
     }
 
-    if(endpos_block != endpos && nblks != 0){
+    if(endpos_block != 0 && nblks != 0){
         if((ret = sfs_bmap_load_nolock(sfs, sin, blkno, &ino)) != 0){
             return ret;
         }
